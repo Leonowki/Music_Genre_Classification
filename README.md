@@ -1,8 +1,9 @@
-***bash
+files are large specially the model, you need this
+```bash
 git lfs install
 
+```
 
-***
 
 
 SETUP
