@@ -57,7 +57,7 @@ def model_prediction(X_test):
 #UI
 st.sidebar.title("Dashboard")
 
-app_page = st.sidebar.selectbox("Select Page",["Home","About Project","Try AI inbox"])
+app_page = st.sidebar.selectbox("Select Page",["Home","About Project"])
 
 
 if app_page == "Home":
@@ -73,6 +73,33 @@ if app_page == "Home":
 
     It's that simple! Try it now and let AI Inbox classify your song's genre!
     """)
+    
+    st.header("Model Prediction")
+    mp3_file = st.file_uploader("Upload your Mp3 file here and AI Inbox will try to guess its genre(Note:genres are limited to 10 genres, see about us for the genre list available)", type=["mp3"])
+    
+    if mp3_file is not None:
+        # Save the file to a temporary directory
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+            tmp_file.write(mp3_file.read())  # Save the uploaded file
+            file_path = tmp_file.name  # Get the temporary file path
+
+        st.markdown(f"File saved to temporary path!")  # Inform user
+
+        # Optionally play the audio
+        if st.button("Play Audio"):
+            st.audio(file_path)
+    
+    if st.button("Predict Genre"):
+        with st.spinner("Please wait Ai Inbox is analyzing..."):
+            try:
+                X_test = load_and_preprocess_file(file_path)  # Load and preprocess the saved file
+                result_index = model_prediction(X_test)  # Predict the genre
+                
+                label = ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"]
+                st.balloons()
+                st.markdown(f"**Model Prediction: :orange[{label[result_index]}] music!**")
+            except Exception as e:
+                st.error(f"Error occurred: {e}")
     
 
 
@@ -129,6 +156,19 @@ elif app_page == "About Project":
     
     """)
     
+    
+    st.markdown("""
+                ***Document link***
+                - https://docs.google.com/document/d/1HYeWml-7T1M3dThNWwtiPX-I3P84di4zBtdWK96FicA/edit?tab=t.0
+                
+                **Repository Link**
+                - https://github.com/Leonowki/Music_Genre_Classification
+                
+                
+                
+                
+                """)
+    
     # Display member details
     for member in group_members:
         col1, col2 = st.columns([1, 3])  
@@ -143,31 +183,5 @@ elif app_page == "About Project":
     
 
 
-# AI INBOX
-elif(app_page == "Try AI inbox"):
-    st.header("Model Prediction")
-    mp3_file = st.file_uploader("Upload your Mp3 file here and AI Inbox will try to guess its genre(Note:genres are limited to 10 genres, see about us for the genre list available)", type=["mp3"])
-    
-    if mp3_file is not None:
-        # Save the file to a temporary directory
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
-            tmp_file.write(mp3_file.read())  # Save the uploaded file
-            file_path = tmp_file.name  # Get the temporary file path
 
-        st.markdown(f"File saved to temporary path!")  # Inform user
-
-        # Optionally play the audio
-        if st.button("Play Audio"):
-            st.audio(file_path)
     
-    if st.button("Predict Genre"):
-        with st.spinner("Please wait Ai Inbox is analyzing..."):
-            try:
-                X_test = load_and_preprocess_file(file_path)  # Load and preprocess the saved file
-                result_index = model_prediction(X_test)  # Predict the genre
-                
-                label = ["blues", "classical", "country", "disco", "hiphop", "jazz", "metal", "pop", "reggae", "rock"]
-                st.balloons()
-                st.markdown(f"Model Prediction: **{label[result_index]}** music or song!")
-            except Exception as e:
-                st.error(f"Error occurred: {e}")
